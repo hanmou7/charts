@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div style="position: relative;">
+    <canvas id="myCanvas" width="500" height="400" style="border: 1px solid #000"></canvas>
+    <canvas id="myCanvas2" width="500" height="400"
+            style="position: absolute;top: 0;left: 0;"></canvas>
+</div>
+<script type="text/javascript">
+    function cBarChart(opt){
+        var canvas=document.getElementById('myCanvas');
+        var ctx=canvas.getContext('2d');
+        //--------------------------------------------------------------------绘制上面可动的小圆
+        var canvas2 = document.getElementById('myCanvas2');
+        var ctx2 = canvas2.getContext('2d');
+
+        var val = opt.data.val;
+        function drawBg(x){
+            ctx.globalAlpha=0.2;
+            ctx.fillStyle='#97a7a9';
+            ctx.fillRect(x,80,60,220);
+            //上椭圆
+            ctx.beginPath();
+            ctx.ellipse(x+30, 80, 30, 14, 0, 0, Math.PI, true);
+            //radiusX:x方向上半径,radiusY：x方向上半径,0.5:rotation：旋转角度
+            ctx.closePath();
+            ctx.fillStyle = "#97a7a9";
+            ctx.fill();
+        }
+        // 下圆矩形是可动的
+        var dReact = function(x,y){
+            var h = 0;
+            ctx.globalAlpha=1;
+            setInterval(function(){
+                //---------------------------------------------------------------y/2是最终的位置
+                if(h < y-99){
+                    h += 5;
+                    // 用粗线画下面的矩形
+                    ctx.beginPath();
+                    ctx.lineWidth=60;
+                    ctx.moveTo(x+30,300);
+                    ctx.lineTo(x+30,300-h);
+                    ctx.stroke();
+                    ctx.closePath();
+                }
+            },21);
+
+            //下bottom椭圆
+            ctx.beginPath();
+            // x方向位置，y方向位置，水平半径，竖直方向半径，旋转角度,大小。
+            ctx.ellipse(x+30, 300, 30, 14, 0, 0, Math.PI, false);
+            //radiusX:x方向上半径,radiusY：x方向上半径,0.5:rotation：旋转角度
+            ctx.closePath();
+            ctx.fillStyle = "#14506b";
+            ctx.fill();
+        };
+        //---------------------------------------------------------------坐标轴
+        //绘制X轴
+        ctx.beginPath();
+        ctx.moveTo(50, 350);
+        ctx.lineTo(450, 350);
+        ctx.lineTo(450-10, 350-10);
+        ctx.moveTo(450, 350);
+        ctx.lineTo(450-10, 350+10);
+        ctx.font = "16px Microsoft YaHei";
+        ctx.fillText('年份', 420, 378);
+        ctx.lineJoin = 'round'; //线的连接处采用圆角
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#14506b';
+        ctx.stroke();
+
+        //绘制Y轴
+        ctx.beginPath();  //必须开始新路径
+        ctx.moveTo(50, 350);
+        ctx.lineTo(50, 30);
+        ctx.lineTo(50-10, 30+10);
+        ctx.moveTo(50, 30);
+        ctx.lineTo(50+10, 30+10);
+        ctx.fillText('总量', 8, 50);
+        //---------------------------------------------------------------坐标轴
+        for(var i=1;i<=5;i++){
+            ctx.moveTo(50, 350-i*50);
+            ctx.lineTo(45, 350-i*50);
+            ctx.stroke();
+            //---------------------------------------------------------------文字部分
+            ctx.font = "20px Microsoft YaHei";
+            ctx.fillText(300-i*50, 8, 50*(i+1)+5);
+        }
+        for(var i=1;i<=val.length;i++){
+            ctx.beginPath();
+            ctx.strokeStyle='#14506b';
+            ctx.lineWidth=1;
+            ctx.moveTo(110+(i-1)*90, 350);
+            ctx.lineTo(110+(i-1)*90, 355);
+            ctx.stroke();
+            //---------------------------------------------------------------文字部分
+            ctx.font = "20px Microsoft YaHei";
+            ctx.fillText(2014+i, 110+(i-1)*90-20 , 380);
+            drawBg(80+(i-1)*90);
+            // console.log(val[i-1])
+            dReact(80+(i-1)*90,val[i-1]);
+            topCircle(111+(i-1)*90,val[i-1])
+        }
+
+        function topCircle(x,y){
+            ctx2.beginPath();
+            // x方向位置，y方向位置，水平半径，竖直方向半径，旋转角度,大小。
+            ctx2.ellipse(x, 280, 30, 14, 0, 0, 2*Math.PI, true);
+            // radiusX:x方向上半径,radiusY：x方向上半径,0.5:rotation：旋转角度
+            ctx2.closePath();
+            ctx2.fillStyle = "#1f81ac";
+            ctx2.fill();
+            var speed=0;
+            var startPoint=300;
+            var timmer;
+            function run(cxt){
+                speed=-7;
+                if(startPoint> 400-y){
+                    ctx2.clearRect(x-30,80,80,280);
+                    startPoint+=speed;
+                    ctx2.beginPath();
+                    ctx2.ellipse(x, startPoint, 30, 14, 0, 0, 2*Math.PI, true);
+                    ctx2.closePath();
+                    ctx2.fill();
+                }else{
+                    clearInterval(timmer)
+                }
+            }
+            timmer = setInterval(function(){
+                run(ctx2);
+            },30);
+        }
+        // topCircle(111)
+    }
+
+
+    var data={
+        "val":[200,250,300,200]
+    };
+    cBarChart({
+        data:data
+    })
+</script>
+</body>
+</html>
